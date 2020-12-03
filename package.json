@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\""
+    "test": "echo \"Error: no test specified\"",
+    "prepublish": "tsc"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,6 @@
   },
   "keywords": [],
   "author": "veighnsche",
-  "license": "ISC"
+  "license": "ISC",
+  "types": "index.d.ts"
 }
