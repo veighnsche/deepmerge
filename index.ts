@@ -43,7 +43,7 @@ export function emptyTarget(val: [] | {} | any): any[] | Record<any, any> {
 }
 
 export function cloneIfNecessary<T extends Record<any, any> = Record<any, any>>(value: T, options: Options) {
-  return (options?.clone && isMergeableObject(value))
+  return (options && options.clone && isMergeableObject(value))
     ? deepmerge(emptyTarget(value), value, options)
     : value
 }
