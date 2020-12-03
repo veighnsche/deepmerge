@@ -2,7 +2,7 @@
   "name": "@veighnsche/deepmerge",
   "version": "0.1.2",
   "description": "",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "prepublish": "tsc"
