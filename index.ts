@@ -1,4 +1,27 @@
-function isMergeableObject(value) {
+interface Options {
+  clone: boolean;
+  arrayMerge: (target: any[], source: any[], options: Options) => any[]
+}
+
+export function deepmerge<T extends Record<any, any> | any[] = Record<any, any> | any[]>(target: T, source: T, options: Options = {
+  arrayMerge: defaultArrayMerge,
+  clone: false
+}): T {
+  const isSourceArray = Array.isArray(source)
+  const isTargetArray = Array.isArray(target)
+
+  if (isSourceArray && isTargetArray) {
+    return options.arrayMerge(target as any[], source as any[], options) as T
+  }
+  else if (isSourceArray) {
+    return cloneIfNecessary(source, options)
+  }
+  else {
+    return mergeObject(target, source, options)
+  }
+}
+
+function isMergeableObject<T extends Record<any, any> = Record<any, any>>(value: T): boolean {
   const nonNullObject = value && typeof value === 'object'
   const excludedPrototypes = ['[object RegExp]', '[object Date]']
   const prototype = Object.prototype.toString.call(value)
@@ -6,17 +29,17 @@ function isMergeableObject(value) {
   return nonNullObject && !excludedPrototypes.includes(prototype)
 }
 
-function emptyTarget(val) {
+function emptyTarget(val: [] | {} | any): any[] | Record<any, any> {
   return Array.isArray(val) ? [] : {}
 }
 
-function cloneIfNecessary(value, options) {
+function cloneIfNecessary<T extends Record<any, any> = Record<any, any>>(value: T, options: Options) {
   return (options?.clone && isMergeableObject(value))
     ? deepmerge(emptyTarget(value), value, options)
     : value
 }
 
-function defaultArrayMerge(target, source, options) {
+function defaultArrayMerge(target: any[], source: any[], options: Options) {
   const destination = [...target]
   source.forEach((item, idx) => {
     if (typeof destination[idx] === 'undefined') {
@@ -32,8 +55,8 @@ function defaultArrayMerge(target, source, options) {
   return destination
 }
 
-function mergeObject(target, source, options) {
-  const destination = {}
+function mergeObject<T extends Record<any, any> = Record<any, any>>(target: T, source: T, options: Options) {
+  const destination: Record<any, any> = {}
 
   if (isMergeableObject(target)) {
     Object.keys(target).forEach(key => {
@@ -52,25 +75,7 @@ function mergeObject(target, source, options) {
   return destination
 }
 
-export function deepmerge(target, source, options = {
-  arrayMerge: defaultArrayMerge,
-  clone: false
-}) {
-  const isSourceArray = Array.isArray(source)
-  const isTargetArray = Array.isArray(target)
-
-  if (isSourceArray && isTargetArray) {
-    return options.arrayMerge(target, source, options)
-  }
-  else if (isSourceArray) {
-    return cloneIfNecessary(source, options)
-  }
-  else {
-    return mergeObject(target, source, options)
-  }
-}
-
-deepmerge.series = function deepmergeAll(array, options) {
+deepmerge.series = function deepmergeAll<T extends Record<any, any> | any[] = Record<any, any> | any[]>(array: T[], options: Options) {
   if (!Array.isArray(array) || array.length < 2) {
     throw new Error('first argument should be an array with at least two elements')
   }
